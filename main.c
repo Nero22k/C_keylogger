@@ -411,9 +411,26 @@ void EntryPoint() // this is the entry point of the program
 
 int Mymain() // this is the real main function
 {
-	char buffer[256];
+	char buffer[MAX_PATH];
+	// Get the path of the temp directory
+    	char tempPath[MAX_PATH];
+	if (GetTempPathA(sizeof(tempPath), tempPath) == 0)
+    	{
+		Mystrcpy_s(buffer,sizeof(buffer),"[-] Failed to get temp path!");
+		MessageBoxA_t(NULL, buffer, "Error", MB_ICONERROR | MB_OK);
+		return -1;
+    	}
 
-	hOutputFile = CreateFileA("log.txt", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+	// Create a unique file name
+	char tempFile[MAX_PATH];
+	if (GetTempFileNameA(tempPath, "VEX", 0, tempFile) == 0)
+	{
+		Mystrcpy_s(buffer, sizeof(buffer), "[-] Failed to get temp file name!");
+		MessageBoxA_t(NULL, buffer, "Error", MB_ICONERROR | MB_OK);
+		return -1;
+	}
+
+	hOutputFile = CreateFileA(tempFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (hOutputFile == INVALID_HANDLE_VALUE)
 	{
